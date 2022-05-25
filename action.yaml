@@ -55,7 +55,7 @@ runs:
       shell: bash
       run: |
         export SOURCE_GET_URL=$(echo ${{ toJSON(steps.source_endpoint.outputs.SOURCE_ENDPOINT) }} | jq -r '.get')
-        curl -X POST https://api.heroku.com/review-apps \
+        export CREATEAPP = $(curl -X POST https://api.heroku.com/review-apps \
         -d '{
         "source_blob": {"url": "'"$SOURCE_GET_URL"'", "version": "'"${{ github.event.pull_request.head.sha }}"'"},
         "branch": "${{ github.head_ref }}",
@@ -64,7 +64,8 @@ runs:
         }' \
         -H "Content-Type: application/json" \
         -H "Accept: application/vnd.heroku+json; version=3" \
-        -H "Authorization: Bearer ${{ inputs.api-key }}"
+        -H "Authorization: Bearer ${{ inputs.api-key }}")
+        echo $CREATEAPP
     - name: Create Build
       if: ${{ github.event_name == 'pull_request' && github.event.action == 'synchronize' }}
       shell: bash
@@ -74,8 +75,8 @@ runs:
         -d '{"source_blob":{"url":"'"$SOURCE_GET_URL"'", "version": "${{ github.event.pull_request.head.sha }}"}}' \
         -H 'Accept: application/vnd.heroku+json; version=3' \
         -H "Content-Type: application/json" \
-        -H "Authorization: Bearer ${{ inputs.api-key }}" | \
-        jq -r '.output_stream_url')
+        -H "Authorization: Bearer ${{ inputs.api-key }}")
+        echo ::set-output name=OUTPUT_STREAM_URL::$(echo $OUTPUT_STREAM_URL | jq -r '.output_stream_url' )
     - name: Set Output:url
       id: output-url
       shell: bash

@@ -34,7 +34,7 @@ runs:
       id: source_endpoint
       shell: bash
       run: |
-        curl -n -X POST https://api.heroku.com/pipelines/{{ inputs.pipeline-id }}/review-app-config \
+        curl -n -X POST "https://api.heroku.com/pipelines/${{ inputs.pipeline-id }}/review-app-config" \
           -d '{
           "repo": "withmarmalade/marmalade",
           "automatic_review_apps": false,

@@ -70,12 +70,12 @@ runs:
       shell: bash
       run: |
         export SOURCE_GET_URL=$(echo ${{ toJSON(steps.source_endpoint.outputs.SOURCE_ENDPOINT) }} | jq -r '.get')
-        curl -X POST "https://api.heroku.com/apps/$APP_NAME/builds" \
+        export OUTPUT_STREAM_URL=$(curl -X POST https://api.heroku.com/apps/$APP_NAME/builds \
         -d '{"source_blob":{"url":"'"$SOURCE_GET_URL"'", "version": "${{ github.event.pull_request.head.sha }}"}}' \
         -H 'Accept: application/vnd.heroku+json; version=3' \
         -H "Content-Type: application/json" \
-        -H "Authorization: Bearer ${{ inputs.api-key }}"
-
+        -H "Authorization: Bearer ${{ inputs.api-key }}" | \
+        jq -r '.output_stream_url')
     - name: Set Output:url
       id: output-url
       shell: bash

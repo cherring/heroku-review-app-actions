@@ -34,6 +34,20 @@ runs:
       id: source_endpoint
       shell: bash
       run: |
+        curl -n -X POST https://api.heroku.com/pipelines/{{ inputs.pipeline-id }}/review-app-config \
+          -d '{
+          "repo": "withmarmalade/marmalade",
+          "automatic_review_apps": false,
+          "destroy_stale_apps": false,
+          "deploy_target": {
+            "id": "us",
+            "type": "region"
+          },
+          "wait_for_ci": false,
+          "base_name": "marm-review-app"
+        }' \
+          -H "Content-Type: application/json" \
+          -H "Accept: application/vnd.heroku+json; version=3"
         export RESPONSE=$(curl -X POST https://api.heroku.com/sources \
         -H "Content-Type: application/json" \
         -H "Accept: application/vnd.heroku+json; version=3" \
